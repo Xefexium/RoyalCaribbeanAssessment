@@ -1,0 +1,5 @@
+# Python depedencies
+venv/
+
+# DB File
+time_zone_db.db
