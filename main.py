@@ -10,51 +10,57 @@ class TimezoneDBAPI:
 
     DATABASE_PATH = './time_zone_db.db'
     BASE_URL = 'http://api.timezonedb.com/v2.1'
-    API_KEY = None
-    cursor = None
+    API_KEY: str = None
+    _instance = None
+    cursor: sqlite3.Connection = None
 
     """ Singleton class for TimezoneDB API"""
-    def __new__(cls):
+    def __new__(cls, api_key):
         if not cls._instance:
             cls._instance = super(TimezoneDBAPI, cls).__new__(cls)
             cls._instance.cursor = sqlite3.connect(cls.DATABASE_PATH)
+            cls.API_KEY = api_key
         return cls._instance
 
-    def __init__(self, api_key):
-        self.API_KEY = api_key
+    def __init__(self, api_key): # API key initalized in the __new__ method
+        self.create_tzdb_timezones_table()
+        self.create_tzdb_details_table()
+        self.create_tzdb_error_log_table()
 
-    def create_tzdb_timezones_table(self, cursor):
-        cursor.execute('''
+    def create_tzdb_timezones_table(self):
+        logging.info('Dropping TZDB_TIMEZONES table if exists')
+        self.cursor.execute('DROP TABLE IF EXISTS TZDB_TIMEZONES')
+        logging.info('Creating TZDB_TIMEZONES table')
+        self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS TZDB_TIMEZONES (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                zoneName TEXT,
-                countryCode TEXT,
-                countryName TEXT,
-                timestamp INTEGER
+                countryCode TEXT CHECK(LENGTH(countryCode) <= 2),
+                countryName TEXT CHECK(LENGTH(countryName) <= 100),
+                zoneName TEXT PRIMARY KEY CHECK(LENGTH(zoneName) <= 100),
+                gmtOffset INTEGER,
+                import_date INTEGER
             )
         ''')
     
-    def create_tzdb_details_table(self, cursor):
-        cursor.execute('''
+    def create_tzdb_details_table(self):
+        logging.info('Creating TZDB_ZONE_DETAILS table')
+        self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS TZDB_ZONE_DETAILS (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 countryCode TEXT,
                 countryName TEXT,
-                zoneName TEXT,
-                abbreviation TEXT,
+                zoneName TEXT PRIMARY KEY,
                 gmtOffset INTEGER,
-                dst TEXT,
-                timestamp INTEGER
+                dst INTEGER,
+                zoneStart INTEGER,
+                zoneEnd INTEGER,
+                import_date INTEGER
             )
         ''')
 
-    def create_tzdb_error_log_table(self, cursor):
-        cursor.execute('''
+    def create_tzdb_error_log_table(self):
+        self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS TZDB_ERROR_LOG (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                errorCode TEXT,
-                message TEXT,
-                timestamp INTEGER
+                error_date INTEGER,
+                error_message TEXT CHECK(LENGTH(error_message) <= 1000)
             )
         ''')
 
