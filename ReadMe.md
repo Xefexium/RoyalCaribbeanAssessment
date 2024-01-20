@@ -11,6 +11,8 @@ Python 3.7+ should work, however here are the below versions I used:
 
 ## Setting up the environment
 
+Normally the `.env` file is omitted from the repository to ensure API keys are hidden. For the purpose of making the assessment easy to run, I've left the `.env` file with the API key inside.
+
 Ensure to run the correct command depending on your OS.
 
 ### Linux
