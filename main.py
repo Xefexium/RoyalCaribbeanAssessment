@@ -2,8 +2,9 @@ from dotenv import load_dotenv
 import logging
 import sys
 import os
-from timezoneDB import TimezoneDB
-from timezoneDBAPI import TimezoneDBAPI
+from TimezoneDB import TimezoneDB
+from TimezoneDBAPI import TimezoneDBAPI
+import time
 
 def get_api_key():
     api_key = os.getenv('TIMEZONE_DB_API_KEY')
@@ -36,5 +37,12 @@ if __name__ == '__main__':
     zone_detail = api.get_timezone_by_position(40.689247, -74.044502)
     db.insert_tzdb_details_table(zone_detail)
 
+    time.sleep(1) # API rated limit is 1 request per second
+
     zone_detail = api.get_timezone_by_zone('America/New_York')
+    db.insert_tzdb_details_table(zone_detail)
+
+    time.sleep(1) # API rated limit is 1 request per second
+
+    zone_detail = api.get_timezone_by_position(25.7617, -80.191)
     db.insert_tzdb_details_table(zone_detail)

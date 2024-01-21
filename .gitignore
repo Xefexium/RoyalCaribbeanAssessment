@@ -1,3 +1,6 @@
+# Compiled source
+__pycache__/
+
 # Python depedencies
 venv/
 
