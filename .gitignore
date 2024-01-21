@@ -2,4 +2,4 @@
 venv/
 
 # DB File
-time_zone_db.db
+timezonedb.db
