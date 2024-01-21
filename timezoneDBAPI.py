@@ -14,6 +14,7 @@ class TimezoneDBAPI:
         logging.info('Requesting %s' % endpoint)
         response = requests.get(self.BASE_URL + endpoint, params=params)
 
+        logging.info('Response status code: %s' % response.status_code)
         if response.status_code == 200:
             return response.json()
         else:
